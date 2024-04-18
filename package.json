@@ -1,0 +1,16 @@
+{
+	"name": "@vaaas/dependency-injection",
+	"version": "1.0.0",
+	"sideEffects": false,
+	"type": "module",
+	"main": "./index.ts",
+	"scripts": {
+		"test": ""
+	},
+	"dependencies": {
+		"@types/node": "^20.12.7"
+	},
+	"devDependencies": {
+		"ts-node": "^10.9.2"
+	}
+}
