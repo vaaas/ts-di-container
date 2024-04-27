@@ -4,6 +4,11 @@
 	"sideEffects": false,
 	"type": "module",
 	"main": "./index.ts",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/vaaas/ts-di-container.git"
+	},
 	"scripts": {
 		"test": "node --test --loader=ts-node/esm *.test.ts"
 	},
