@@ -1,5 +1,7 @@
 {
 	"name": "@vaaas/dependency-injection",
+	"description": "Dependency Injection Container in Typescript",
+	"author": "Vasileios Pasialiokis",
 	"version": "1.0.0",
 	"sideEffects": false,
 	"type": "module",
@@ -7,8 +9,12 @@
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/vaaas/ts-di-container.git"
+		"url": "git+https://github.com/vaaas/ts-di-container.git"
 	},
+	"bugs": {
+		"url": "https://github.com/vaaas/ts-di-container/issues"
+	},
+	"homepage": "https://github.com/vaaas/ts-di-container#readme",
 	"scripts": {
 		"test": "node --test --loader=ts-node/esm *.test.ts"
 	},
