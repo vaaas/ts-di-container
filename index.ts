@@ -41,7 +41,7 @@ export interface Injectable {
  * }
  *
  * const container = new DIContainer();
- * const servicie = container.construct(SomeService);
+ * const service = container.construct(SomeService);
  */
 export class DIContainer {
 	private instances: Map<any, InstanceType<Injectable>>;
