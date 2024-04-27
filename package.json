@@ -2,7 +2,7 @@
 	"name": "@vaaas/dependency-injection",
 	"description": "Dependency Injection Container in Typescript",
 	"author": "Vasileios Pasialiokis",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"sideEffects": false,
 	"type": "module",
 	"main": "./index.ts",

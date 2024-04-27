@@ -1,11 +1,11 @@
 /**
  * injectable classes must provide a static `dependencies` method
  *
- * the dependencies are in turn other injectable classes
+ * the dependencies are in turn other injectable classes or symbols that can be resolved to instances
  */
 export interface Injectable {
 	new (...xs: any[]): any;
-	dependencies?: () => Array<Injectable> | ReadonlyArray<Injectable>;
+	dependencies?: () => Array<any> | ReadonlyArray<any>;
 }
 
 /**
