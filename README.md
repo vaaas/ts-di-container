@@ -10,7 +10,7 @@ Every constructed instance will be registered in the container, so it is only in
 
 Only synchronous construction is supported.
 
-You can manually register injectables using `DIContainer.register`. This is primarily useful for registering injectables that are constructed asynchronously.
+You can manually register injectables using `DIContainer.add`. This is primarily useful for registering injectables that are constructed asynchronously.
 
 # Example
 
@@ -22,7 +22,7 @@ class SomeRepository {
 class SomeService {
 	constructor(repo: SomeRepository) {
 		this.repo = repo;
-   }
+	}
 
 	static dependencies() {
 		return [
@@ -33,4 +33,13 @@ class SomeService {
 
 const container = new DIContainer();
 const service = container.construct(SomeService);
+```
+
+You can also override the default construction logic by registering a custom provider.
+
+```typescript
+const container = new DIContainer();
+container.provide(SomeRepository, () => 'arbitrary');
+const service = container.construct(SomeService);
+// service.repo === 'arbitrary';
 ```

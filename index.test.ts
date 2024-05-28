@@ -10,6 +10,26 @@ describe('ConstructionError', () => {
 		assert.equal(error.message, 'Error constructing Injectable');
 		assert.equal(error.cause, cause);
 	});
+
+	it('creates errors for symbols', () => {
+		const error = new ConstructionError(Symbol('test'), new Error('a cause'));
+		assert.equal(error.message, 'Error constructing Symbol(test)');
+	});
+
+	it('creates errors for objects', () => {
+		const error = new ConstructionError({}, new Error('a cause'));
+		assert.equal(error.message, 'Error constructing [object Object]');
+	});
+
+	it('creates errors for null', () => {
+		const error = new ConstructionError(null, new Error('a cause'));
+		assert.equal(error.message, 'Error constructing null');
+	});
+
+	it('creates errors for undefined', () => {
+		const error = new ConstructionError(undefined, new Error('a cause'));
+		assert.equal(error.message, 'Error constructing undefined');
+	});
 });
 
 describe('DIContainer', () => {
@@ -64,5 +84,21 @@ describe('DIContainer', () => {
 		const container = new DIContainer();
 		const result = container.construct(DefaultsAndDependencies);
 		assert.equal(result instanceof DefaultsAndDependencies, true);
+	});
+
+	it('creates an instance via a provider', () => {
+		const RequestRandomNumber = Symbol();
+		const result = new DIContainer()
+			.provide(RequestRandomNumber, () => 4)
+			.construct(RequestRandomNumber as any);
+		assert.equal(result, 4);
+	});
+
+	it('overrides default construction with a provider', () => {
+		const result = new DIContainer()
+			.provide(NoDependencies, () => 'hello, world')
+			.construct(DefaultsAndDependencies);
+		assert.equal(result instanceof DefaultsAndDependencies, true);
+		assert.equal(result.a, 'hello, world');
 	});
 });

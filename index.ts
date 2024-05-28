@@ -17,7 +17,7 @@ export interface Injectable {
  *
  * Only synchronous construction is supported.
  *
- * You can manually register injectables using `DIContainer.register`. This is primarily useful for registering injectables that are constructed asynchronously.
+ * You can manually register injectables using `DIContainer.add`. This is primarily useful for registering injectables that are constructed asynchronously.
  *
  * @see Injectable
  * @see https://en.wikipedia.org/wiki/Dependency_injection
@@ -31,7 +31,7 @@ export interface Injectable {
  * class SomeService {
  * 	constructor(repo: SomeRepository) {
  * 		this.repo = repo;
- *    }
+ * 	}
  *
  * 	static dependencies() {
  * 		return [
@@ -42,12 +42,20 @@ export interface Injectable {
  *
  * const container = new DIContainer();
  * const service = container.construct(SomeService);
+ *
+ * @example
+ * const container = new DIContainer();
+ * container.provide(SomeRepository, () => 'arbitrary');
+ * const service = container.construct(SomeService);
+ * // service.repo === 'arbitrary';
  */
 export class DIContainer {
-	private instances: Map<any, InstanceType<Injectable>>;
+	private instances: Map<any, any>;
+	private providers: Map<any, () => any>;
 
 	constructor() {
 		this.instances = new Map();
+		this.providers = new Map();
 	}
 
 	/**
@@ -57,8 +65,22 @@ export class DIContainer {
 	 * @param value the instance you want to register
 	 * @returns DIContainer (supports method chaining)
 	 */
-	register(key: any, value: InstanceType<Injectable>): DIContainer {
+	add(key: any, value: any): DIContainer {
 		this.instances.set(key, value);
+		return this;
+	}
+
+	/**
+	 * register a provider function in the container to be used while constructing
+	 *
+	 * if a provider exists for a requested key, the provider will be called instead of the regular construction logic
+	 *
+	 * @param key the key to look up to reference the provider
+	 * @param value the provider function you want to register
+	 * @returns DIContainer (supports method chaining)
+	 */
+	provide(key: any, value: () => any): DIContainer {
+		this.providers.set(key, value);
 		return this;
 	}
 
@@ -75,21 +97,40 @@ export class DIContainer {
 		try {
 			if (this.instances.has(object))
 				return this.instances.get(object);
-			const dependencies: any[] =
-				object.dependencies
-				? object.dependencies().map((x: any) => this.construct(x))
-				: [];
-			const instance = new object(...dependencies);
-			this.register(object, instance);
-			return instance;
+			else if (this.providers.has(object))
+				return this.constructViaProvider(object);
+			else
+				return this.constructViaDependencies(object);
 		} catch (e) {
 			throw new ConstructionError(object, e as Error);
 		}
 	}
+
+	private constructViaProvider(key: any): any {
+		const instance = this.providers.get(key)();
+		this.add(key, instance);
+		return instance;
+	}
+
+	private constructViaDependencies<T extends Injectable>(object: T): InstanceType<T> {
+		const dependencies: any[] =
+		object.dependencies
+			? object.dependencies().map((x: any) => this.construct(x))
+			: [];
+		const instance = new object(...dependencies);
+		this.add(object, instance);
+		return instance;
+	}
 }
 
 export class ConstructionError extends Error {
-	constructor(x: Injectable, cause: Error) {
-		super('Error constructing ' + x.name, { cause });
+	constructor(x: any, cause: Error) {
+		const reference =
+			x === null || x === undefined
+			? x
+			: x.name !== undefined
+			? x.name
+			: x.toString()
+		super('Error constructing ' + reference, { cause });
 	}
 }
